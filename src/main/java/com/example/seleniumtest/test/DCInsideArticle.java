@@ -20,62 +20,6 @@ public class DCInsideArticle {
 		this.recommendsCount = recommendsCount;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getWriter() {
-		return writer;
-	}
-
-	public void setWriter(String writer) {
-		this.writer = writer;
-	}
-
-	public String getIpStart() {
-		return ipStart;
-	}
-
-	public void setIpStart(String ipStart) {
-		this.ipStart = ipStart;
-	}
-
-	public String getRegDate() {
-		return regDate;
-	}
-
-	public void setRegDate(String regDate) {
-		this.regDate = regDate;
-	}
-
-	public int getHit() {
-		return hit;
-	}
-
-	public void setHit(int hit) {
-		this.hit = hit;
-	}
-
-	public int getRecommendsCount() {
-		return recommendsCount;
-	}
-
-	public void setRecommendsCount(int recommendsCount) {
-		this.recommendsCount = recommendsCount;
-	}
-
 	@Override
 	public String toString() {
 		return "DCInsideArticle{" +
