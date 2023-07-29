@@ -19,7 +19,41 @@ import org.openqa.selenium.chrome.ChromeOptions;
 public class SeleniumTest {
 
 	public static void main(String[] args) {
-		printDCInsideTreeGalleryLatestArticles();
+		printNaverNewsFlashLatestArticles();
+		// printDCInsideTreeGalleryLatestArticles();
+		// printPpomppuFreeLatestArticles();
+		// downloadUnsplashNatureImages();
+	}
+
+	private static void printNaverNewsFlashLatestArticles() {
+		String innerFolderName = "naverNewsFlash";
+		makeDownloadsFoldersIfNotExists(innerFolderName);
+		ChromeDriver driver = getChromeDriver();
+
+		List<String> tabs = new ArrayList<>(driver.getWindowHandles());
+
+		// 첫번째 탭으로 전환
+		driver.switchTo().window(tabs.get(0));
+		driver.get("https://news.naver.com/main/list.naver?mode=LSD&mid=sec&sid1=001");
+
+		List<WebElement> elements = driver.findElements(By.cssSelector(".type06_headline li"));
+		// List<WebElement> elements = driver.findElements(By.cssSelector(".type06 li"));
+
+		for (WebElement element : elements) {
+			WebElement aElement = element.findElement(By.cssSelector("dt > a"));
+			String href = aElement.getAttribute("href");
+			String code = href.substring(href.lastIndexOf("/") + 1, href.indexOf("?"));
+			String title = element.findElement(By.cssSelector("dt:not(.photo) > a")).getText().trim();
+			String summary = element.findElement(By.cssSelector("dd > .lede")).getText().trim();
+			String channel = element.findElement(By.cssSelector("dd > .writing")).getText().trim();
+			List<WebElement> thumbElements = element.findElements(By.cssSelector("dt.photo > a > img"));
+			String thumbUrl = "";
+			if (!thumbElements.isEmpty()) {
+				thumbUrl = thumbElements.get(0).getAttribute("src");
+				downloadImage(thumbUrl, "downloads/" + innerFolderName);
+			}
+			System.out.println(thumbUrl);
+		}
 	}
 
 	private static void printDCInsideTreeGalleryLatestArticles() {
@@ -82,6 +116,8 @@ public class SeleniumTest {
 	}
 
 	private static void downloadUnsplashNatureImages() {
+		String innerFolderName = "unsplash";
+		makeDownloadsFoldersIfNotExists(innerFolderName);
 		ChromeDriver driver = getChromeDriver();
 
 		// 빈 탭 생성
@@ -97,12 +133,10 @@ public class SeleniumTest {
 
 		List<WebElement> imgElements = driver.findElements(By.cssSelector("[data-test=\"masonry-grid-count-three\"] img[data-test=\"photo-grid-masonry-img\"]"));
 
-		makeDownloadsFoldersIfNotExists();
-
 		for (WebElement imgElement : imgElements) {
 			String src = imgElement.getAttribute("src");
 
-			downloadImage(src);
+			downloadImage(src, "downloads/" + innerFolderName);
 
 			System.out.println("src = " + src);
 		}
@@ -125,14 +159,14 @@ public class SeleniumTest {
 		return driver;
 	}
 
-	private static void makeDownloadsFoldersIfNotExists() {
-		File downloadsFolder = new File("downloads");
+	private static void makeDownloadsFoldersIfNotExists(String innerFolderName) {
+		File downloadsFolder = new File("downloads/" + innerFolderName);
 		if (!downloadsFolder.exists()) {
 			downloadsFolder.mkdirs();
 		}
 	}
 
-	private static void downloadImage(String src) {
+	private static void downloadImage(String src, String folderName) {
 		BufferedImage saveImage = null;
 
 		try {
@@ -143,9 +177,10 @@ public class SeleniumTest {
 
 		if (saveImage != null) {
 			try {
-				String fileName = src.split("/")[3];
+				// String fileName = src.split("/")[3];
+				String fileName = src.substring(src.lastIndexOf("/"), src.indexOf(".", src.lastIndexOf("/")));
 				fileName = fileName.split("\\?")[0];
-				ImageIO.write(saveImage, "jpg", new File("downloads/" + fileName + ".jpg"));
+				ImageIO.write(saveImage, "jpg", new File(folderName + "/" + fileName + ".jpg"));
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
