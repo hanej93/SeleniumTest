@@ -19,7 +19,46 @@ import org.openqa.selenium.chrome.ChromeOptions;
 public class SeleniumTest {
 
 	public static void main(String[] args) {
-		printPpomppuFreeLatestArticles();
+		printDCInsideTreeGalleryLatestArticles();
+	}
+
+	private static void printDCInsideTreeGalleryLatestArticles() {
+		ChromeDriver driver = getChromeDriver();
+
+		List<String> tabs = new ArrayList<>(driver.getWindowHandles());
+
+		// 첫번째 탭으로 전환
+		driver.switchTo().window(tabs.get(0));
+		driver.get("https://gall.dcinside.com/board/lists/?id=tree");
+
+		Util.sleep(1000); // 웹페이지가 띄워지는 시간 대기
+
+		List<WebElement> elements = driver.findElements(By.cssSelector(".gall_list .us-post"));
+
+		for (WebElement element : elements) {
+			int id = Util.getAsInt(element.findElements(By.cssSelector(".gall_num")).get(0).getText());
+			String title = element.findElements(By.cssSelector(".gall_tit")).get(0).getText().trim();
+			String writer = element.findElements(By.cssSelector(".gall_writer .nickname")).get(0).getText().trim();
+			List<WebElement> ipElements = element.findElements(By.cssSelector(".gall_writer .ip"));
+			String ipStart = "";
+			if (!ipElements.isEmpty()) {
+				ipStart = ipElements.get(0).getText().trim();
+			}
+			String regDate = element.findElements(By.cssSelector(".gall_date")).get(0).getAttribute("title").trim();
+			int hit =  Util.getAsInt(element.findElements(By.cssSelector(".gall_count")).get(0).getText());
+			int recommendsCount = Util.getAsInt(element.findElements(By.cssSelector(".gall_recommend")).get(0).getText());
+
+			// String regDate = element.findElements(By.cssSelector(".gall_date")).get(0).getText().trim();
+			// if (regDate.contains(":")) {
+			// 	regDate = Util.getNowDateStr().substring(0, 7);
+			// } else {
+			// 	regDate = regDate.replaceAll("\\.", ":");
+			// 	regDate = "20" + regDate;
+			// }
+
+			DCInsideArticle article = new DCInsideArticle(id, title, writer, ipStart, regDate, hit, recommendsCount);
+			System.out.println(article);
+		}
 	}
 
 	private static void printPpomppuFreeLatestArticles() {
@@ -35,7 +74,6 @@ public class SeleniumTest {
 
 		List<WebElement> elements = driver.findElements(
 			By.cssSelector("#revolution_main_table tbody tr:not(.list_notice) > td:nth-child(3) > a"));
-		System.out.println(elements.size());
 
 		for (WebElement element : elements) {
 			String title = element.getText().trim();
